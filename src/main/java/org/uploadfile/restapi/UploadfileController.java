@@ -29,15 +29,14 @@ public class UploadfileController {
 	@PostMapping
 	public ResponseEntity<?> uploadfile(@RequestParam("file") MultipartFile file) {
 
-		System.out.println("go save file");
 		if (file == null && file.isEmpty())
 			return new ResponseEntity<>("please send a file", HttpStatus.BAD_REQUEST);
 
 		try {
 
-			saveFile(file);
+			String savedPath = saveFile(file);
 
-			return new ResponseEntity<>("upload", HttpStatus.OK);
+			return new ResponseEntity<>(savedPath, HttpStatus.OK);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
@@ -46,11 +45,12 @@ public class UploadfileController {
 
 	}
 
-	private void saveFile(MultipartFile file) throws IOException {
+	private String saveFile(MultipartFile file) throws IOException {
 		byte[] bytes = file.getBytes();
-		System.out.println("upload path : " + uploadPath);
-		Path path = Paths.get(uploadPath + file.getOriginalFilename());
+		String fullFilePath = uploadPath + file.getOriginalFilename();
+		Path path = Paths.get(fullFilePath);
 		Files.write(path, bytes);
+		return fullFilePath;
 	}
 
 }
